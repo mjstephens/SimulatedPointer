@@ -1,0 +1,14 @@
+{
+  "name": "com.galaxygourd.simulatedpointer",
+  "version": "1.0.0",
+  "displayName": "GourdPointer",
+  "description": "Input pointer equipped for controller or mouse navigation.",
+  "author": {
+    "name": "Michael Stephens",
+    "email": "mstephens.dev@gmail.com",
+    "url" : "http://www.mstephensdev.com/" 
+  },
+  "dependencies": {
+    "com.unity.inputsystem": "1.7.0"
+  }
+}
