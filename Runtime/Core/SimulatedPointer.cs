@@ -28,10 +28,9 @@ namespace GalaxyGourd.SimulatedPointer
         public bool IsOverUI => HoveredObjects.Count > 0;
         public RectTransform Rect { get; private set; }
         public Vector2 Delta => _dataInput.Delta;
-        public Camera Camera => _uiCamera;
+        public Camera Camera { get; private set; }
         public List<GameObject> HoveredObjects { get; private set; } = new();
 
-        private Camera _uiCamera;
         private EventSystem _eventSystem;
         private RectTransform _pointerOverlay;
         private PointerEventData _eventData;
@@ -61,7 +60,7 @@ namespace GalaxyGourd.SimulatedPointer
             
             // Try and get camera
             Canvas canvas = GetComponentInParent<Canvas>();
-            _uiCamera = canvas.renderMode == RenderMode.ScreenSpaceCamera ? canvas.worldCamera : null;
+            Camera = canvas.renderMode == RenderMode.ScreenSpaceCamera ? canvas.worldCamera : null;
         }
 
         private void OnEnable()
@@ -133,7 +132,7 @@ namespace GalaxyGourd.SimulatedPointer
             _eventData.delta = increase;
 
             // Move virtual mouse
-            _eventData.position = _uiCamera == null ? Rect.position : _uiCamera.WorldToScreenPoint(Rect.position);
+            _eventData.position = Camera == null ? Rect.position : Camera.WorldToScreenPoint(Rect.position);
             _raycastResults = new List<RaycastResult>();
             _eventSystem.RaycastAll(_eventData, _raycastResults);
             
@@ -340,10 +339,10 @@ namespace GalaxyGourd.SimulatedPointer
 
         public void SnapPointerToPosition(Vector2 pos)
         {
-            Rect.anchoredPosition = pos;
+            Rect.anchoredPosition = Camera == null ? pos : Camera.ScreenToWorldPoint(pos);
             _dataInput.Position = Rect.position;
             
-            _eventData.position = _uiCamera.WorldToScreenPoint(Rect.position);
+            _eventData.position = Camera.WorldToScreenPoint(Rect.position);
             _prevEventPos = _eventData.position;
         }
 
@@ -361,6 +360,11 @@ namespace GalaxyGourd.SimulatedPointer
                 adjustment.y = _pointerOverlay.rect.yMax - inPosition.y;
             
             return inPosition + adjustment;
+        }
+        
+        public Vector3 GetPointerPosForScreen()
+        {
+            return Camera == null ? Position : Camera.WorldToScreenPoint(Position);
         }
 
         #endregion UTILITY
